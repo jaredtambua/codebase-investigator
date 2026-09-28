@@ -63,6 +63,25 @@ encoding declarations. It never executes source code or resolves imports.
 File, decoding, and syntax errors propagate rather than returning partial
 results. Supported syntax depends on the running Python interpreter.
 
+## Analyze a directory
+
+```python
+from codebase_investigator.directory_analysis import analyze_directory
+
+for path, analysis in analyze_directory(".").items():
+    print(path, analysis.functions, analysis.classes, analysis.imports)
+```
+
+The function accepts a string or `pathlib.Path` pointing to a directory and
+returns a dictionary mapping root-relative `Path` objects to `FileAnalysis`
+results. Entries follow the sorted order returned by `discover_python_files`.
+An empty directory, or one containing no eligible Python files, returns `{}`.
+
+Directory analysis combines the existing discovery and single-file analysis
+APIs. It inherits discovery's exclusions and symbolic-link behavior, and each
+file is analyzed using `analyze_python_file`. Discovery, file access, decoding,
+and syntax errors propagate immediately; no partial result is returned.
+
 ## Development
 
 Create and activate a virtual environment, then install the package and test tools:
