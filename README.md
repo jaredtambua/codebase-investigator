@@ -1,6 +1,8 @@
 # Codebase Investigator
 
 Discover Python source files within a repository or any directory tree.
+Also statically analyze individual Python files to identify top-level functions,
+classes, and imports.
 
 Requires Python 3.10 or later. The package lives in `src/codebase_investigator`,
 and tests live in `tests`.
@@ -25,7 +27,41 @@ non-directory roots, and filesystem access errors raise exceptions rather than
 returning incomplete results.
 
 Git is not required, and `.gitignore` rules are not interpreted. Exclusions are
-fixed for now; there is no CLI or source parsing.
+fixed for now; there is no CLI. Discovery does not parse source files; use the
+separate analysis API below to inspect their contents.
+
+## Analyze a Python file
+
+```python
+from codebase_investigator.analysis import analyze_python_file
+
+analysis = analyze_python_file("src/codebase_investigator/discovery.py")
+for function in analysis.functions:
+    print(function.name, function.lineno, function.is_async)
+for cls in analysis.classes:
+    print(cls.name, cls.lineno)
+for imported in analysis.imports:
+    print(imported.name, imported.alias, imported.module, imported.level)
+```
+
+The function accepts a string or `pathlib.Path` and returns a frozen
+`FileAnalysis` dataclass with tuples of function, class, and import records.
+Each category preserves source order and duplicate entries. Only direct module
+statements are included: methods, nested definitions, and statements inside
+blocks such as `if` and `try` are excluded. Both regular and async functions
+are recognized, including decorated definitions.
+
+Line numbers (`lineno`) are one-based and identify the definition header
+(rather than its decorators) or the import statement. Each imported name gets
+its own record, preserving its optional alias. For `from` imports, `module`
+is the source module and `level` counts leading dots; `from . import name`
+has `module=None` and `level=1`. Plain imports have `module=None` and `level=0`.
+Wildcard imports retain the name `*` without expanding it.
+
+Analysis uses the standard-library AST parser and respects Python source
+encoding declarations. It never executes source code or resolves imports.
+File, decoding, and syntax errors propagate rather than returning partial
+results. Supported syntax depends on the running Python interpreter.
 
 ## Development
 
