@@ -35,8 +35,8 @@ class FileAnalysis:
     imports: tuple[ImportInfo, ...]
 
 
-def analyze_python_file(path: str | Path) -> FileAnalysis:
-    """Analyze direct module statements without executing source code.
+def analyse_python_file(path: str | Path) -> FileAnalysis:
+    """Analyse direct module statements without executing source code.
 
     Results preserve source order within each category, including duplicates.
     Definitions and imports inside other statements are excluded. Line numbers

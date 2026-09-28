@@ -3,11 +3,11 @@ from pathlib import Path
 import pytest
 
 from codebase_investigator.analysis import ClassInfo, FileAnalysis, FunctionInfo, ImportInfo
-from codebase_investigator.directory_analysis import analyze_directory
+from codebase_investigator.directory_analysis import analyse_directory
 
 
 @pytest.mark.parametrize("as_string", [False, True])
-def test_analyzes_nested_files_in_discovery_order(tmp_path, as_string):
+def test_analyses_nested_files_in_discovery_order(tmp_path, as_string):
     (tmp_path / "package").mkdir()
     (tmp_path / "z.py").write_text("class Zebra: pass\n", encoding="utf-8")
     (tmp_path / "package" / "module.py").write_text(
@@ -16,7 +16,7 @@ def test_analyzes_nested_files_in_discovery_order(tmp_path, as_string):
     (tmp_path / "package" / "__init__.py").touch()
     (tmp_path / "a.py").write_text("def first(): pass\n", encoding="utf-8")
 
-    result = analyze_directory(str(tmp_path) if as_string else tmp_path)
+    result = analyse_directory(str(tmp_path) if as_string else tmp_path)
 
     assert list(result) == [
         Path("a.py"), Path("package/__init__.py"),
@@ -39,7 +39,7 @@ def test_relative_root_resolves_files_against_root(tmp_path, monkeypatch):
     (tmp_path / "module.py").write_text("invalid syntax!", encoding="utf-8")
     monkeypatch.chdir(tmp_path)
 
-    assert analyze_directory("repository") == {
+    assert analyse_directory("repository") == {
         Path("module.py"): FileAnalysis((FunctionInfo("inside", 1, False),), (), ())
     }
 
@@ -53,23 +53,23 @@ def test_inherits_discovery_exclusions(tmp_path):
     (tmp_path / "ignored.PY").write_text("invalid syntax!", encoding="utf-8")
     (tmp_path / "keep.py").touch()
 
-    assert analyze_directory(tmp_path) == {Path("keep.py"): FileAnalysis((), (), ())}
+    assert analyse_directory(tmp_path) == {Path("keep.py"): FileAnalysis((), (), ())}
 
 
 def test_empty_directory(tmp_path):
-    assert analyze_directory(tmp_path) == {}
+    assert analyse_directory(tmp_path) == {}
 
 
 def test_missing_root(tmp_path):
     with pytest.raises(FileNotFoundError):
-        analyze_directory(tmp_path / "missing")
+        analyse_directory(tmp_path / "missing")
 
 
 def test_file_root(tmp_path):
     path = tmp_path / "module.py"
     path.touch()
     with pytest.raises(NotADirectoryError):
-        analyze_directory(path)
+        analyse_directory(path)
 
 
 def test_discovery_permission_error_propagates(tmp_path, monkeypatch):
@@ -80,7 +80,7 @@ def test_discovery_permission_error_propagates(tmp_path, monkeypatch):
 
     monkeypatch.setattr(os, "scandir", blocked_scandir)
     with pytest.raises(PermissionError, match="Directory is unreadable"):
-        analyze_directory(tmp_path)
+        analyse_directory(tmp_path)
 
 
 def test_syntax_error_propagates_without_partial_result(tmp_path):
@@ -88,14 +88,14 @@ def test_syntax_error_propagates_without_partial_result(tmp_path):
     broken = tmp_path / "b.py"
     broken.write_text("def broken(\n", encoding="utf-8")
     with pytest.raises(SyntaxError) as error:
-        analyze_directory(tmp_path)
+        analyse_directory(tmp_path)
     assert error.value.filename == str(broken)
 
 
 def test_decoding_error_propagates(tmp_path):
     (tmp_path / "module.py").write_bytes(b"# coding: utf-8\n# comment\nvalue = '\xff'\n")
     with pytest.raises(UnicodeDecodeError):
-        analyze_directory(tmp_path)
+        analyse_directory(tmp_path)
 
 
 def test_file_permission_error_propagates(tmp_path, monkeypatch):
@@ -108,4 +108,4 @@ def test_file_permission_error_propagates(tmp_path, monkeypatch):
 
     monkeypatch.setattr(tokenize, "open", blocked_open)
     with pytest.raises(PermissionError, match="File is unreadable"):
-        analyze_directory(tmp_path)
+        analyse_directory(tmp_path)

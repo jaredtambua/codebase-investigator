@@ -1,7 +1,7 @@
 # Codebase Investigator
 
 Discover Python source files within a repository or any directory tree.
-Also statically analyze individual Python files to identify top-level functions,
+Also statically analyse individual Python files to identify top-level functions,
 classes, and imports.
 
 Requires Python 3.10 or later. The package lives in `src/codebase_investigator`,
@@ -30,12 +30,12 @@ Git is not required, and `.gitignore` rules are not interpreted. Exclusions are
 fixed for now; there is no CLI. Discovery does not parse source files; use the
 separate analysis API below to inspect their contents.
 
-## Analyze a Python file
+## Analyse a Python file
 
 ```python
-from codebase_investigator.analysis import analyze_python_file
+from codebase_investigator.analysis import analyse_python_file
 
-analysis = analyze_python_file("src/codebase_investigator/discovery.py")
+analysis = analyse_python_file("src/codebase_investigator/discovery.py")
 for function in analysis.functions:
     print(function.name, function.lineno, function.is_async)
 for cls in analysis.classes:
@@ -49,7 +49,7 @@ The function accepts a string or `pathlib.Path` and returns a frozen
 Each category preserves source order and duplicate entries. Only direct module
 statements are included: methods, nested definitions, and statements inside
 blocks such as `if` and `try` are excluded. Both regular and async functions
-are recognized, including decorated definitions.
+are recognised, including decorated definitions.
 
 Line numbers (`lineno`) are one-based and identify the definition header
 (rather than its decorators) or the import statement. Each imported name gets
@@ -63,12 +63,12 @@ encoding declarations. It never executes source code or resolves imports.
 File, decoding, and syntax errors propagate rather than returning partial
 results. Supported syntax depends on the running Python interpreter.
 
-## Analyze a directory
+## Analyse a directory
 
 ```python
-from codebase_investigator.directory_analysis import analyze_directory
+from codebase_investigator.directory_analysis import analyse_directory
 
-for path, analysis in analyze_directory(".").items():
+for path, analysis in analyse_directory(".").items():
     print(path, analysis.functions, analysis.classes, analysis.imports)
 ```
 
@@ -78,8 +78,8 @@ results. Entries follow the sorted order returned by `discover_python_files`.
 An empty directory, or one containing no eligible Python files, returns `{}`.
 
 Directory analysis combines the existing discovery and single-file analysis
-APIs. It inherits discovery's exclusions and symbolic-link behavior, and each
-file is analyzed using `analyze_python_file`. Discovery, file access, decoding,
+APIs. It inherits discovery's exclusions and symbolic-link behaviour, and each
+file is analysed using `analyse_python_file`. Discovery, file access, decoding,
 and syntax errors propagate immediately; no partial result is returned.
 
 ## Development

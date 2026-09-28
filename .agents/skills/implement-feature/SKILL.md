@@ -24,7 +24,7 @@ The plan should identify:
 
 - files that need to change,
 - important design decisions,
-- expected behavior,
+- expected behaviour,
 - tests that should be added or changed,
 - anything deliberately left out of scope.
 
@@ -35,13 +35,13 @@ Wait for approval before implementing when the task introduces architectural dec
 After the plan is approved:
 
 - Make the smallest change that satisfies the requirement.
-- Preserve unrelated existing behavior.
+- Preserve unrelated existing behaviour.
 - Follow `AGENTS.md`.
 - Avoid unrelated refactoring.
 
 ## 4. Validate
 
-- Add or update tests for changed behavior.
+- Add or update tests for changed behaviour.
 - Run the relevant tests.
 - Run the full test suite when practical.
 - Investigate failures rather than assuming the implementation is at fault.

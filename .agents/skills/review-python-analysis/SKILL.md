@@ -12,20 +12,20 @@ Review the requested changes and report actionable defects. Do not edit files un
 Read the repository's applicable AGENTS.md, the requested diff or files, and relevant tests. Resolve paths below from the repository root:
 
 - `src/codebase_investigator/analysis.py`: single-file analysis and result records.
-- `tests/test_analysis.py`: analysis behavior and error coverage.
-- `README.md`: public API behavior and examples.
+- `tests/test_analysis.py`: analysis behaviour and error coverage.
+- `README.md`: public API behaviour and examples.
 - `src/codebase_investigator/discovery.py`: inspect only when discovery integration is relevant.
 
-Use the user's requested behavior and current documented contract as the baseline. Distinguish intentional API changes from regressions.
+Use the user's requested behaviour and current documented contract as the baseline. Distinguish intentional API changes from regressions.
 
-## Check analysis behavior
+## Check analysis behaviour
 
-- Keep source inspection static: analyzed files must not be executed or imported. Prefer standard-library parsing; agent reasoning must not substitute for deterministic extraction.
+- Keep source inspection static: analysed files must not be executed or imported. Prefer standard-library parsing; agent reasoning must not substitute for deterministic extraction.
 - Check the agreed scope. The current API includes only direct `ast.Module.body` functions, async functions, classes, and imports. Methods, nested definitions, and statements inside control-flow blocks are excluded unless the requested change deliberately expands that contract.
 - Verify source order within each category and preservation of duplicate definitions and imports. Check definition names, async flags, and one-based line numbers; decorated definitions use the definition header's line.
 - Check import forms relevant to the change: multiple names, aliases, dotted names, relative levels, and wildcard imports. Preserve import metadata without resolving or expanding imported objects.
 - Check Python encoding declarations and propagation of file, decoding, and syntax errors. Invalid input should not silently produce partial results. Account for syntax support depending on the running Python interpreter.
-- Compare documentation and tests with the implementation. Flag missing behavior coverage when it could conceal a concrete regression; avoid requesting tests that merely mirror implementation details.
+- Compare documentation and tests with the implementation. Flag missing behaviour coverage when it could conceal a concrete regression; avoid requesting tests that merely mirror implementation details.
 
 ## Validate and report
 

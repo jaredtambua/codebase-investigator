@@ -7,7 +7,7 @@ from codebase_investigator.analysis import (
     FileAnalysis,
     FunctionInfo,
     ImportInfo,
-    analyze_python_file,
+    analyse_python_file,
 )
 
 
@@ -38,8 +38,8 @@ def test_definitions_preserve_order_and_duplicates_without_execution(tmp_path):
         (ClassInfo("Zebra", 8), ClassInfo("Alpha", 13), ClassInfo("Zebra", 15)),
         (),
     )
-    assert analyze_python_file(path) == expected
-    assert analyze_python_file(str(path)) == expected
+    assert analyse_python_file(path) == expected
+    assert analyse_python_file(str(path)) == expected
 
 
 def test_import_forms(tmp_path):
@@ -54,7 +54,7 @@ def test_import_forms(tmp_path):
         encoding="utf-8",
     )
 
-    assert analyze_python_file(path) == FileAnalysis((), (), (
+    assert analyse_python_file(path) == FileAnalysis((), (), (
         ImportInfo("os", None, None, 0, 1),
         ImportInfo("package.child", "child", None, 0, 1),
         ImportInfo("deque", "queue", "collections", 0, 2),
@@ -76,7 +76,7 @@ def test_import_forms(tmp_path):
 def test_no_direct_definitions_or_imports(tmp_path, source):
     path = tmp_path / "module.py"
     path.write_text(source, encoding="utf-8")
-    assert analyze_python_file(path) == FileAnalysis((), (), ())
+    assert analyse_python_file(path) == FileAnalysis((), (), ())
 
 
 @pytest.mark.parametrize("source", [
@@ -86,13 +86,13 @@ def test_no_direct_definitions_or_imports(tmp_path, source):
 def test_python_source_encodings(tmp_path, source):
     path = tmp_path / "module.py"
     path.write_bytes(source)
-    result = analyze_python_file(path)
+    result = analyse_python_file(path)
     assert [function.name for function in result.functions] == ["café"]
 
 
 def test_missing_file(tmp_path):
     with pytest.raises(FileNotFoundError):
-        analyze_python_file(tmp_path / "missing.py")
+        analyse_python_file(tmp_path / "missing.py")
 
 
 def test_unreadable_file(tmp_path, monkeypatch):
@@ -104,14 +104,14 @@ def test_unreadable_file(tmp_path, monkeypatch):
 
     monkeypatch.setattr(tokenize, "open", blocked_open)
     with pytest.raises(PermissionError, match="File is unreadable"):
-        analyze_python_file(path)
+        analyse_python_file(path)
 
 
 def test_invalid_syntax_includes_filename(tmp_path):
     path = tmp_path / "broken.py"
     path.write_text("import os\ndef broken(\n", encoding="utf-8")
     with pytest.raises(SyntaxError) as error:
-        analyze_python_file(path)
+        analyse_python_file(path)
     assert error.value.filename == str(path)
 
 
@@ -119,4 +119,4 @@ def test_invalid_encoding(tmp_path):
     path = tmp_path / "module.py"
     path.write_bytes(b"# coding: utf-8\n# comment\nvalue = '\xff'\n")
     with pytest.raises(UnicodeDecodeError):
-        analyze_python_file(path)
+        analyse_python_file(path)

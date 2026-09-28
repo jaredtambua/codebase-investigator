@@ -2,7 +2,7 @@
 
 ## Project goals
 
-Codebase Investigator is a Python tool for analyzing and understanding
+Codebase Investigator is a Python tool for analysing and understanding
 software repositories.
 
 Keep the core analysis deterministic. Agentic reasoning should be layered
@@ -10,9 +10,13 @@ on top of deterministic code-analysis capabilities rather than replacing them.
 
 ## Development guidelines
 
+- Use British English for project-owned code and identifiers, comments,
+  docstrings, documentation, and user-facing text.
+- Preserve third-party and standard-library API names, identifiers, and required
+  spellings when referencing or calling them.
 - Prefer the Python standard library unless an external dependency provides clear value.
 - Keep functions and modules focused on a single responsibility.
-- Add or update tests whenever behavior changes.
+- Add or update tests whenever behaviour changes.
 - Prefer deterministic output where practical.
 - Run the relevant tests before declaring a task complete.
 - Do not commit changes unless explicitly requested.
