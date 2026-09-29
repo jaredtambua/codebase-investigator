@@ -30,3 +30,50 @@ For non-trivial changes:
 3. Make the smallest change that satisfies the requirement.
 4. Run relevant tests.
 5. Report what changed, what was tested, and any limitations or unresolved issues.
+
+## Agent orchestration
+
+- The root agent owns task decomposition, coordination, integration,
+  validation and final synthesis.
+- Do not delegate by default. Keep simple or tightly dependent work with
+  the root. Delegate only when independent work or specialist expertise
+  provides a clear benefit.
+- Prefer task specialisation over duplicate general-purpose workers.
+  Independent subtasks may run in parallel within the environment's
+  concurrency limit.
+- Give every worker a bounded task: its objective, relevant context and
+  paths, applicable instructions and skills, permitted actions, expected
+  output and completion criteria.
+- All delegated repository work must follow the applicable AGENTS.md.
+  Workers must return requests for further decomposition to the root
+  rather than spawning additional workers themselves.
+- For consequential changes, prefer fresh-context independent review or
+  evaluation when useful. Supply the requirements, relevant artefacts
+  and evaluation criteria without requiring the reviewer to inherit the
+  implementation discussion.
+- Only one agent, including the root, may modify the shared working tree
+  at a time. The root explicitly assigns and transfers write ownership.
+  Concurrent writers require deliberately introduced isolated worktrees;
+  do not create worktrees as part of the default workflow.
+- Workers normally return results to the root. Use direct sibling
+  communication only when their tasks genuinely depend on one another,
+  and report resulting decisions to the root.
+- Workers report findings or changes, supporting evidence, validation
+  performed, and unresolved questions. The root assesses these results
+  before incorporating them into the final response.
+- Workers are ephemeral by default. Once their task is complete, collect
+  their result and release or close them when the environment supports
+  it. Otherwise leave them idle and do not retain them as standing agents.
+
+## Agent configuration and skills
+
+- Keep repository-wide behaviour and orchestration policy in AGENTS.md.
+- Create reusable .codex/agents/*.toml definitions only for demonstrated
+  recurring specialist roles with meaningfully different standing
+  instructions or configuration.
+- Keep reusable task procedures and expertise in
+  .agents/skills/*/SKILL.md; reference relevant skills rather than copying
+  their procedures into agent definitions.
+- Define one-off specialist roles in runtime delegation instructions.
+  Do not create permanent templates or placeholder agent directories
+  merely to populate the configuration.
