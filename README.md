@@ -82,6 +82,52 @@ APIs. It inherits discovery's exclusions and symbolic-link behaviour, and each
 file is analysed using `analyse_python_file`. Discovery, file access, decoding,
 and syntax errors propagate immediately; no partial result is returned.
 
+## Analyse local import dependencies
+
+```python
+from codebase_investigator.dependencies import analyse_dependencies
+
+for dependency in analyse_dependencies("src"):
+    print(dependency.source, dependency.imported.lineno, dependency.target)
+```
+
+Supply the directory that acts as the import root: use `"."` for a flat
+repository or `"src"` for this project's source layout. The function accepts
+a string or `Path` and returns a tuple of frozen `Dependency` records with
+`source` and `target` paths relative to that root and the original `ImportInfo`
+in `imported`. Sources follow sorted discovery order; imports preserve source
+order and duplicates. Empty directories or no local matches return `()`.
+
+For example, if `app.py` contains `from database import connect` and
+`database.py` exists beside it under the import root, the result links
+`app.py` to `database.py`. Aliases do not affect the target. Dotted imports
+and explicit relative imports within regular packages are supported. Every
+package directory below the root must contain `__init__.py`; the root itself
+is a search directory, not a named package.
+
+Resolution uses these structural rules:
+
+- `import package.module` targets the exact module file, without adding
+  separate relationships for parent package initialisers.
+- `from package import child` prefers an existing child module or package;
+  otherwise it targets `package/__init__.py`. `from module import name`
+  targets the module file, without checking whether `name` is defined.
+- Wildcard imports target the named module or package without expanding names.
+- Missing or external targets, namespace packages, and ambiguous module names
+  produce no relationship. A collision such as both `item.py` and
+  `item/__init__.py` also prevents resolution through that package. An
+  ambiguous child does not fall back to its parent package.
+
+These relationships are static file matches, not proof of runtime import
+behaviour. Package attributes can shadow child modules; re-exports, dynamic
+imports, installed packages and changes to `sys.path` are not resolved. Only
+direct module-level imports are considered, matching the existing analysis
+scope. Cycles and self-imports are recorded without recursively following them.
+
+The API reuses directory analysis's exclusions and error handling. Source code
+is never executed, and file, decoding and syntax errors propagate rather than
+returning partial results. Existing analysis APIs remain unchanged.
+
 ## Development
 
 Create and activate a virtual environment, then install the package and test tools:
