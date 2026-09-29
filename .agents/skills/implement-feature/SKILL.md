@@ -18,7 +18,7 @@ Before making changes:
 
 ## 2. Plan
 
-For non-trivial changes, propose a concise implementation plan before editing.
+The Head Worker reports a complete execution plan to Root before editing for every assignment, proportionate to its complexity.
 
 The plan should identify:
 
@@ -26,18 +26,21 @@ The plan should identify:
 - important design decisions,
 - expected behaviour,
 - tests that should be added or changed,
+- relevant skills and validation commands,
+- useful specialist delegation, or why no specialists are needed,
 - anything deliberately left out of scope.
 
-Wait for approval before implementing when the task introduces architectural decisions.
+Wait for Root's approval when the task introduces architectural decisions or the assignment requires approval. Root may approve routine technical plans within the user's authorised scope; material product or architectural ambiguity and explicit user approval checkpoints must be escalated to the user.
 
 ## 3. Implement
 
-After the plan is approved:
+After any required approval and assignment of write ownership:
 
 - Make the smallest change that satisfies the requirement.
 - Preserve unrelated existing behaviour.
 - Follow `AGENTS.md`.
 - Avoid unrelated refactoring.
+- Integrate specialist findings and fix confirmed issues within scope.
 
 ## 4. Validate
 
@@ -57,7 +60,7 @@ Before declaring completion:
 
 ## 6. Report
 
-Report:
+The Head Worker reports to Root for final supervisory assessment:
 
 - what changed,
 - what was tested,
@@ -65,4 +68,4 @@ Report:
 - any skipped tests,
 - limitations or unresolved issues.
 
-Do not commit changes unless explicitly requested.
+Do not commit changes. Commits remain exclusively under the user's control.

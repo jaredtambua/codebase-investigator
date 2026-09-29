@@ -5,7 +5,7 @@ description: Review changes to Codebase Investigator's deterministic Python sour
 
 # Review Python analysis
 
-Review the requested changes and report actionable defects. Do not edit files unless the user also requests fixes.
+Review the requested changes and report actionable defects. Remain read-only unless fixes are within the authorised assignment and write ownership has been explicitly transferred to you under AGENTS.md. Verify the evidence supporting your findings and return them to the assigning Head Worker or Root.
 
 ## Establish the contract
 
