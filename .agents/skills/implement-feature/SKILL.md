@@ -18,7 +18,7 @@ Before making changes:
 
 ## 2. Plan
 
-The Head Worker reports a complete execution plan to Root before editing for every assignment, proportionate to its complexity.
+Root prepares an execution plan before editing, proportionate to the task's complexity.
 
 The plan should identify:
 
@@ -27,14 +27,14 @@ The plan should identify:
 - expected behaviour,
 - tests that should be added or changed,
 - relevant skills and validation commands,
-- useful specialist delegation, or why no specialists are needed,
+- useful specialist delegation, when warranted under `AGENTS.md`,
 - anything deliberately left out of scope.
 
-Wait for Root's approval when the task introduces architectural decisions or the assignment requires approval. Root may approve routine technical plans within the user's authorised scope; material product or architectural ambiguity and explicit user approval checkpoints must be escalated to the user.
+Follow `AGENTS.md` for engineering authority, clarification and approval checkpoints.
 
 ## 3. Implement
 
-After any required approval and assignment of write ownership:
+After any required approval, with write ownership governed by `AGENTS.md`:
 
 - Make the smallest change that satisfies the requirement.
 - Preserve unrelated existing behaviour.
@@ -57,15 +57,19 @@ Before declaring completion:
 - Check for accidental or unrelated changes.
 - Verify existing documentation was preserved when updating it.
 - Check that the implementation still matches the approved plan.
+- Apply the independent-review policy in `AGENTS.md`. Verify material findings,
+  fix confirmed defects within scope and revalidate after changes.
 
 ## 6. Report
 
-The Head Worker reports to Root for final supervisory assessment:
+Root reports the engineering outcome directly to the user:
 
 - what changed,
+- changed files and important design decisions,
 - what was tested,
 - test results,
 - any skipped tests,
+- independent-review outcome, or why review was skipped,
 - limitations or unresolved issues.
 
 Do not commit changes. Commits remain exclusively under the user's control.

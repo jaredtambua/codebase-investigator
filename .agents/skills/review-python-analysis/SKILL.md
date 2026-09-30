@@ -5,7 +5,7 @@ description: Review changes to Codebase Investigator's deterministic Python sour
 
 # Review Python analysis
 
-Review the requested changes and report actionable defects. Remain read-only unless fixes are within the authorised assignment and write ownership has been explicitly transferred to you under AGENTS.md. Verify the evidence supporting your findings and return them to the assigning Head Worker or Root.
+Review the requested changes and report actionable defects to Root. Remain read-only; Root owns fixes. Follow the independent-review and context-engineering policy in `AGENTS.md` and verify the evidence supporting your findings.
 
 ## Establish the contract
 
@@ -31,4 +31,4 @@ Use the user's requested behaviour and current documented contract as the baseli
 
 Run relevant existing tests when execution is within the user's requested scope. From the repository root on Windows, use `.venv\Scripts\python.exe -m pytest tests/test_analysis.py`; use the project's configured interpreter on other platforms. Include discovery tests when integration is affected. Respect inspection-only requests and disclose tests not run.
 
-Report findings in severity order with file and line references, the triggering input or condition, and the observable consequence. Separate confirmed defects from open questions. If there are no findings, say so and identify meaningful coverage limitations. State which tests ran and their results, including skips.
+Report actionable findings in severity order with evidence, file and line references, the triggering input or condition, expected versus observed behaviour where applicable, and relevant uncertainty. Separate confirmed defects from open questions. If no actionable findings were identified, say so and identify meaningful coverage limitations. State which tests ran and their results, including skips.

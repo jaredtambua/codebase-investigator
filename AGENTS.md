@@ -33,87 +33,98 @@ For non-trivial changes:
 
 ## Agent orchestration
 
-### Root: Supervisor and Architect
+### Root: Lead Engineer, Orchestrator and default writer
 
-- The user communicates with Root. Root clarifies intent, owns high-level
-  requirements and architecture, and delegates every engineering task,
-  including simple tasks, to a Head Worker.
-- Give the Head Worker a bounded assignment: objective, relevant context
-  and paths, constraints, permitted actions, expected output and completion
-  criteria. Root should not normally implement or modify application files.
-- Root approves routine technical plans within the user's authorised scope.
-  Escalate material product or architectural ambiguity to the user and
-  honour explicit user approval checkpoints.
-- Root assesses completed work against the user's original intent and owns
-  final supervisory assessment and synthesis. Root never commits.
+- Root owns the engineering task end-to-end: understand the request, inspect
+  applicable instructions, skills and source, plan proportionately, implement,
+  validate, assess review findings, fix confirmed defects and report the outcome.
+- Root makes routine engineering decisions within the user's authorised scope.
+  Ask the user for clarification only when ambiguity materially affects product
+  behaviour, public contracts or architecture. Honour explicit approval checkpoints.
+- Root decides whether bounded specialist investigation provides enough value
+  to justify its context and usage cost, collates findings and makes the final
+  engineering decisions. Delegation is optional; no intermediary role is required.
+- Root is the default and normally sole writer. No agent may commit changes.
 
-### Head Worker: Lead Engineer and default writer
+### Investigation specialists
 
-- Read applicable repository instructions and skills and inspect the
-  repository before forming a complete execution plan for every assignment,
-  proportionate to its complexity. Cover implementation, relevant skills,
-  validation and useful specialist delegation. Report the plan to Root and
-  wait for approval before implementation when required by the assignment
-  or skills, or when architectural decisions are involved.
-- After required approval, the Head Worker is the default owner of writes.
-  Integrate specialist findings, make the final engineering judgement,
-  implement the change and perform integrated technical validation.
-- Use specialists conservatively: bounded investigation, research, parallel
-  investigation, independent context or evaluation must justify their
-  additional context and usage costs. Prefer task specialisation over
-  duplicate general-purpose agents.
-- The Head Worker may spawn bounded specialists, or ask Root to spawn them
-  when the available tools require it. Do not create another Head Worker
-  layer. Escalate assignment-level decomposition or architecture questions
-  to Root.
-- Report changes, supporting evidence, validation results, limitations and
-  unresolved questions to Root. Workers never commit.
+- All delegated work follows the applicable AGENTS.md and relevant skills.
+- Give each specialist one bounded question or investigation. Specialists are
+  read-only by default, inspect relevant evidence themselves and investigate
+  deeply enough to answer the question.
+- Return concise findings, evidence with source references, recommendations,
+  material assumptions, uncertainties and unresolved questions directly to Root.
+  Advise Root rather than make the final engineering decision.
+- Specialists must not recursively delegate. Request additional context or
+  further decomposition from Root when necessary.
 
-### Specialists, verification and coordination
+### Independent review
 
-- All delegated repository work follows the applicable AGENTS.md. Every
-  specialist receives a bounded objective, relevant context and paths,
-  applicable skills, permitted actions, expected output and completion
-  criteria.
-- Specialists are read-only by default. Investigate deeply, verify evidence
-  supporting findings, and return constraints, edge cases and recommendations
-  to the Head Worker. Specialists must not spawn workers; return requests
-  for further decomposition to the Head Worker or Root as appropriate.
-- Every worker verifies the work or evidence it owns. For consequential
-  changes, the Head Worker should use fresh-context, read-only independent
-  review when its expected value justifies the cost. Supply requirements,
-  relevant artefacts and evaluation criteria without requiring the reviewer
-  to inherit the implementation discussion.
-- The Head Worker assesses review findings, fixes confirmed problems where
-  appropriate, and escalates unresolved disagreements or architectural
-  questions to Root before reporting completion.
+- For substantive code changes, Root should normally request fresh-context,
+  read-only independent review after implementation and initial validation when
+  its expected value justifies the additional context and usage cost. Trivial
+  changes may skip independent review with a proportionate justification.
+- Supply the original or approved requirement, behavioural contract or acceptance
+  criteria, applicable repository rules, final diff or relevant implementation,
+  relevant tests and explicit review criteria. Exclude implementation reasoning,
+  specialist recommendations, rejected alternatives, confidence statements and
+  other conclusions that could unnecessarily anchor the review.
+- Reviewers remain read-only and seek concrete contract violations, regressions,
+  missing edge cases and inconsistencies. Report actionable findings with evidence,
+  triggering conditions, expected versus observed behaviour where applicable,
+  severity and relevant uncertainty. Say when no actionable findings were identified.
+- Findings are evidence, not instructions. Root must reproduce or otherwise verify
+  material findings, assess their validity, fix confirmed defects within scope and
+  revalidate. Escalate material architectural disagreements or unresolved product
+  questions to the user.
+
+### Write ownership and coordination
+
 - Only one agent may own writes to the shared working tree at a time.
-  Root assigns initial ownership to the Head Worker; the Head Worker may
-  explicitly transfer ownership to a specialist and must reclaim it before
-  editing again. A transfer suspends the previous owner's permission to
-  write. Read-only specialists must not modify files without this transfer.
-  Concurrent writers require deliberately isolated worktrees; do not
-  introduce worktrees as part of the default workflow.
+  Root may explicitly transfer ownership to a specialist for a bounded scope
+  and must reclaim it before editing again. A transfer suspends Root's permission
+  to write. Specialists must not modify files without this transfer; independent
+  reviewers remain read-only. Do not introduce worktrees or parallel writers as
+  part of the default workflow.
 - Parallelise useful independent read-only investigations within the
-  environment's concurrently active agent limit, including Root and the
-  Head Worker. This is not a cumulative agent budget for a task; do not
+  environment's concurrently active agent limit, including Root. This is not
+  a cumulative agent budget for a task; do not
   maximise concurrency merely because capacity is available.
-- Specialist results normally return to the Head Worker for synthesis.
+- Specialist results return to Root for synthesis.
   Use direct sibling communication only for genuine task dependencies,
-  and report resulting decisions to the Head Worker.
-- Workers are ephemeral by default. Collect results when tasks finish and
+  and report resulting decisions to Root.
+- Delegated agents are ephemeral by default. Collect results when tasks finish and
   release or close workers where supported; otherwise leave them idle.
   Do not assume an explicit release tool or unlimited cumulative creation
   is available.
 
+## Context engineering
+
+- Compile context before delegation rather than passing raw discussion. Include
+  the objective, relevant approved decisions, constraints, applicable rules and
+  skills, relevant artefacts or paths, permitted actions, expected output,
+  completion criteria and escalation conditions.
+- Provide minimum sufficient, role-relevant context. Do not automatically share
+  the complete parent conversation, other specialists' investigations, Root's
+  entire implementation plan or unrelated repository and product information.
+  Default to no inherited conversation history; use `fork_turns="none"` when
+  supported and supply a compiled assignment explicitly.
+- Expand context progressively. Agents should retrieve or request materially
+  necessary information rather than guess; minimum context must not become
+  context starvation. Reviewers request missing requirements or evidence without
+  receiving implementation reasoning or prior conclusions.
+- Return compressed, evidence-backed results rather than raw investigation
+  transcripts. Preserve material assumptions, confidence limitations, conflicting
+  evidence and unresolved questions. Inspect source, tests, documentation, diffs
+  or command output directly where practical rather than inherit opinions.
+- Root's final report to the user contains the engineering outcome, important
+  design decisions, validation performed, independent-review outcome (or why it
+  was skipped), unresolved questions and changed files, without an unnecessary
+  implementation transcript.
+
 ## Agent configuration and skills
 
 - Keep repository-wide behaviour and orchestration policy in AGENTS.md.
-- The recurring Head Worker role is defined in
-  `.codex/agents/head-worker.toml`. Use it where custom-agent selection is
-  supported. When runtime spawning has no custom-agent selector, Root must
-  read that definition and pass its role instructions with the bounded
-  assignment explicitly; a matching task name does not load the file.
 - Create reusable .codex/agents/*.toml definitions only for demonstrated
   recurring roles with meaningfully different standing instructions or
   configuration.
