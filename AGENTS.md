@@ -77,6 +77,24 @@ For non-trivial changes:
   material findings, assess their validity, fix confirmed defects within scope and
   revalidate. Escalate material architectural disagreements or unresolved product
   questions to the user.
+- When Root verifies and fixes a material reviewer-identified defect, revalidate
+  and independently review the corrected implementation again. Each re-review
+  uses a new reviewer with fresh context and the requirements, rules, current
+  implementation or diff, tests and review criteria specified above. Exclude
+  previous review conclusions and correction reasoning under the same isolation
+  policy; provide relevant evidence without inherited opinions.
+- One correction round comprises fixing the confirmed actionable findings from
+  a review, revalidating and independently reviewing the corrected implementation.
+  Multiple findings addressed together count as one round; the initial review
+  does not count. Continue until no confirmed actionable findings remain, with
+  Root verifying each review's findings before deciding whether another round
+  is required.
+- Target completion within two correction rounds. A third round is permitted
+  but is the hard maximum. If its re-review leaves confirmed actionable findings,
+  stop further correction rounds and escalate unresolved issues to the user.
+  Existing architectural and product escalation rules still apply earlier.
+- Ordinary test failures and implementation errors during development remain
+  Root's normal self-correction and do not count as review correction rounds.
 
 ### Write ownership and coordination
 

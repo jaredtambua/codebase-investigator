@@ -1,11 +1,85 @@
 # Codebase Investigator
 
-Discover Python source files within a repository or any directory tree.
-Also statically analyse individual Python files to identify top-level functions,
-classes, and imports.
+Find the part of a Python codebase to understand before modifying a specific
+file, function, class or method. Reading guides identify the implementation,
+related tests, direct local dependencies and consumers with source evidence.
+The underlying discovery and static-analysis APIs are also available separately.
 
 Requires Python 3.10 or later. The package lives in `src/codebase_investigator`,
 and tests live in `tests`.
+
+## Understand a change target
+
+```sh
+python -m codebase_investigator analyse_dependencies --root . --import-root src
+python -m codebase_investigator src/codebase_investigator/dependencies.py:90 --import-root src
+python -m codebase_investigator src/codebase_investigator/dependencies.py --import-root src --limit 10
+```
+
+After installation, `codebase-investigator` runs the same command. Targets are
+repository-relative file paths, `file.py:line`, `file.py:qualified_name` (for
+example `service.py:Service.work`), or bare/qualified symbol names. Duplicate
+matches return choices and exit status 2 rather than selecting silently. A line
+selects the innermost enclosing definition, or the module outside definitions.
+Missing targets, invalid roots and analysis errors also exit with status 2.
+
+Use `--root` for the repository to inspect and `--import-root` for its Python
+import layout. Import roots default to `.` and must be directories within the
+repository; repeat the flag when necessary. All eligible Python files are
+inspected, including tests outside import roots. No code or tests are executed.
+
+```python
+from codebase_investigator.reading_guide import build_reading_guide
+
+guide = build_reading_guide(".", "analyse_dependencies", import_roots=("src",))
+for item in guide.items:
+    print(item.category, item.symbol.path, item.symbol.lineno, item.reason)
+    for evidence in item.evidence:
+        print(evidence.kind, evidence.path, evidence.lineno, evidence.expression)
+```
+
+`ReadingGuide` and its records are frozen dataclasses. `targets` contains the
+selected definition or ambiguity choices. Each symbol has its kind, qualified
+name, header line, source range including decorators, signature, docstring and
+source. `items` supplies enclosing context, related tests, direct dependencies
+and consumers, in that priority order with stable path/line ordering. Shared
+locations are deduplicated and their evidence is retained. Selection reserves
+space across categories so many tests do not crowd out dependencies; broader
+test/consumer module entries are omitted when precise entries exist in that file.
+`unresolved` contains
+possible or unresolved references separately; name similarity is not a definite
+relationship. The API's positive `limit` (default 20) caps reading items and
+unresolved records separately, with `omitted_items` and `omitted_unresolved`
+counts. Ordinary unbound local values and builtin names are omitted from the
+guide's uncertainty list unless they have a possible local symbol match; the
+underlying reference API retains them. The CLI bounds source excerpts and
+evidence display too. To expand,
+select a related target or increase the limit; the guide does not recurse.
+
+The index includes methods, nested and conditional definitions. Resolution
+supports lexical definitions and explicit local imports, aliases and module
+attributes, including imports inside functions. Reassignment, duplicate bindings,
+wildcard imports and global/nonlocal declarations prevent confident name
+resolution. Forward bindings in class bodies remain uncertain rather than being
+treated as references to definitions that have not yet been bound. Explicit
+attribute writes or deletions through resolved module aliases
+also invalidate links to those attributes across the analysed tree. Static
+references may appear in code that never executes. General
+object dispatch, namespace packages, re-export chains, dynamic imports and
+external callers are not resolved. Import roots with competing module names
+remain ambiguous. Existing file/dependency analysis contracts remain unchanged.
+
+Test paths (`tests/`, `test_*.py`, or `*_test.py`) identify related test source;
+their references and module imports are evidence of relevance, not coverage.
+Module imports provide broader context and are labelled as imports, never as
+function calls. A guide can therefore include a module importer without finding
+a call to the selected function. The guide neither proves complete change
+impact nor infers behaviour beyond source, docstrings and test evidence.
+
+`index_codebase` in `codebase_investigator.symbols` exposes the richer symbol
+inventory, and `collect_references` in `codebase_investigator.references` exposes
+the underlying reference records. Discovery exclusions and immediate propagation
+of filesystem, decoding and syntax errors apply to all new analysis APIs.
 
 ## Discover Python files
 
@@ -27,7 +101,7 @@ non-directory roots, and filesystem access errors raise exceptions rather than
 returning incomplete results.
 
 Git is not required, and `.gitignore` rules are not interpreted. Exclusions are
-fixed for now; there is no CLI. Discovery does not parse source files; use the
+fixed for now. Discovery does not parse source files; use the
 separate analysis API below to inspect their contents.
 
 ## Analyse a Python file
@@ -127,6 +201,40 @@ scope. Cycles and self-imports are recorded without recursively following them.
 The API reuses directory analysis's exclusions and error handling. Source code
 is never executed, and file, decoding and syntax errors propagate rather than
 returning partial results. Existing analysis APIs remain unchanged.
+
+## Find potentially unused functions
+
+```python
+from codebase_investigator.unused_functions import find_unused_functions
+
+for candidate in find_unused_functions("."):
+    print(candidate.path, candidate.function.name, candidate.function.lineno)
+```
+
+The function accepts a directory as a string or `Path` and returns a tuple of
+frozen `UnusedFunction` records containing a root-relative `path` and a
+`FunctionInfo` in `function`. Candidates include only direct module-level
+functions, including async functions. Results follow sorted file order then
+definition order, preserving duplicates. Empty results are `()`.
+
+Calls, callback references, loaded attributes and `from` imports (including
+aliases and imports inside functions) count as possible usage. References are
+searched throughout every discovered file, including tests. Plain module imports
+alone do not mark their functions as used. Decorated functions and literal names
+in direct module-level `__all__` assignments are retained as possible registrations
+or exports. Any wildcard import suppresses all candidates.
+
+Matching is conservative and based on names across the entire analysed tree,
+without resolving bindings, types or imports. An unrelated local variable,
+attribute or imported object with the same name can therefore hide an unused
+function. Self-references and references from otherwise unused functions also
+count: this is reference detection, not reachability analysis. Strings outside
+`__all__`, external callers and dynamic references are not recognised. Reported
+functions are candidates for investigation, not proof that removal is safe.
+
+Discovery exclusions and symbolic-link behaviour apply. Source is never executed;
+file, decoding and syntax errors propagate without returning partial results.
+Existing analysis APIs are unchanged.
 
 ## Development
 

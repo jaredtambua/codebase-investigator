@@ -10,6 +10,9 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = []
 
+[project.scripts]
+codebase-investigator = "codebase_investigator.cli:main"
+
 [project.optional-dependencies]
 dev = ["pytest>=8"]
 
